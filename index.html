@@ -340,6 +340,60 @@
         .delete-btn:hover {
             background: #ff3838;
         }
+
+        /* Stili per l'editor LaTeX integrato */
+        .latex-helper {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .symbol-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .symbol-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+            box-shadow: none;
+        }
+
+        .symbol-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .symbol-btn:active {
+            transform: translateY(0);
+        }
+
+        .template-section select {
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .symbol-buttons {
+                grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            }
+            
+            .symbol-btn {
+                font-size: 14px;
+                padding: 10px 2px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -389,6 +443,61 @@
                 <p style="margin: 5px 0; font-size: 0.9em; color: #667eea;">
                     Non conosci LaTeX? Usa l'<a href="https://editor.codecogs.com/" target="_blank" style="color: #667eea; font-weight: bold;">Editor Visuale CodeCogs</a> per creare la tua formula!
                 </p>
+                
+                <!-- Editor LaTeX integrato -->
+                <div class="latex-helper">
+                    <p style="margin: 10px 0 5px 0; font-size: 0.9em; color: #333; font-weight: bold;">
+                        🎯 Oppure usa il nostro editor rapido:
+                    </p>
+                    <div class="symbol-buttons">
+                        <!-- Simboli comuni -->
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\sqrt{}')" title="Radice quadrata">√</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\frac{}{}')" title="Frazione">⁄</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('^{}')" title="Esponente">xⁿ</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('_{}')" title="Pedice">x₍ᵢ₎</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\pm')" title="Più o meno">±</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\cdot')" title="Moltiplicazione">·</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\div')" title="Divisione">÷</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\neq')" title="Diverso">≠</button>
+                        
+                        <!-- Lettere greche -->
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\alpha')" title="Alpha">α</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\beta')" title="Beta">β</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\gamma')" title="Gamma">γ</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\delta')" title="Delta">δ</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\pi')" title="Pi greco">π</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\theta')" title="Theta">θ</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\lambda')" title="Lambda">λ</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\mu')" title="Mu">μ</button>
+                        
+                        <!-- Simboli matematici -->
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\infty')" title="Infinito">∞</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\sum')" title="Sommatoria">∑</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\int')" title="Integrale">∫</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\partial')" title="Derivata parziale">∂</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\leq')" title="Minore uguale">≤</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\geq')" title="Maggiore uguale">≥</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\rightarrow')" title="Freccia destra">→</button>
+                        <button type="button" class="symbol-btn" onclick="insertSymbol('\\leftarrow')" title="Freccia sinistra">←</button>
+                    </div>
+                    
+                    <!-- Template formule comuni -->
+                    <div class="template-section">
+                        <p style="margin: 10px 0 5px 0; font-size: 0.9em; color: #333;">📐 Template pronti all'uso:</p>
+                        <select id="formulaTemplate" onchange="insertTemplate()" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+                            <option value="">-- Seleziona un template --</option>
+                            <option value="x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}">Equazione di 2° grado</option>
+                            <option value="d = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}">Distanza tra due punti</option>
+                            <option value="A = \\pi r^2">Area del cerchio</option>
+                            <option value="V = \\frac{4}{3}\\pi r^3">Volume della sfera</option>
+                            <option value="\\sin^2\\theta + \\cos^2\\theta = 1">Identità fondamentale</option>
+                            <option value="e^{i\\pi} + 1 = 0">Identità di Eulero</option>
+                            <option value="\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1">Limite notevole</option>
+                            <option value="\\frac{d}{dx}[f(x)g(x)] = f'(x)g(x) + f(x)g'(x)">Derivata del prodotto</option>
+                        </select>
+                    </div>
+                </div>
+                
                 <div class="latex-preview" id="latexPreview"></div>
             </div>
 
@@ -624,6 +733,43 @@
 
         // Carica formule all'avvio
         loadFormulas();
+
+        // Funzioni per l'editor LaTeX integrato
+        function insertSymbol(symbol) {
+            const input = document.getElementById('formulaLatex');
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const text = input.value;
+            
+            // Inserisce il simbolo alla posizione del cursore
+            const before = text.substring(0, start);
+            const after = text.substring(end);
+            
+            input.value = before + symbol + after;
+            
+            // Posiziona il cursore nel posto giusto
+            const cursorPos = start + symbol.length;
+            if (symbol.includes('{}')) {
+                // Se c'è {}, metti il cursore dentro le graffe
+                input.setSelectionRange(start + symbol.indexOf('{') + 1, start + symbol.indexOf('{') + 1);
+            } else {
+                input.setSelectionRange(cursorPos, cursorPos);
+            }
+            
+            input.focus();
+            updatePreview();
+        }
+
+        function insertTemplate() {
+            const select = document.getElementById('formulaTemplate');
+            const template = select.value;
+            
+            if (template) {
+                document.getElementById('formulaLatex').value = template;
+                updatePreview();
+                select.value = ''; // Reset del select
+            }
+        }
     </script>
 </body>
 </html>
