@@ -279,6 +279,7 @@
     <div class="container">
         <h1>📐 FormularioMat</h1>
         <p class="subtitle">Il tuo assistente per memorizzare le formule matematiche</p>
+        <p class="subtitle" style="font-size: 0.9em; margin-top: -10px; color: #999;">Sviluppato da Antonio Moliterni (alias Ananasso Malvagio)</p>
 
         <div class="controls">
             <button onclick="openModal()">➕ Aggiungi Formula</button>
@@ -318,6 +319,9 @@
             <div class="form-group">
                 <label for="formulaLatex">Formula (LaTeX):</label>
                 <input type="text" id="formulaLatex" placeholder="es. d = \sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}" onkeyup="updatePreview()">
+                <p style="margin: 5px 0; font-size: 0.9em; color: #667eea;">
+                    Non conosci LaTeX? Usa l'<a href="https://editor.codecogs.com/" target="_blank" style="color: #667eea; font-weight: bold;">Editor Visuale CodeCogs</a> per creare la tua formula!
+                </p>
                 <div class="latex-preview" id="latexPreview"></div>
             </div>
 
@@ -550,5 +554,7 @@
         // Carica formule all'avvio
         loadFormulas();
     </script>
+</body>
+</html>
 </body>
 </html>
