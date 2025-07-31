@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FormularioMat - Memorizza le Formule Matematiche</title>
+    <title>MALEmaticApp - Memorizza le Formule Matematiche</title>
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
     <style>
@@ -138,6 +138,7 @@
                 margin: 20px auto;
                 padding: 20px;
                 width: 95%;
+                max-height: 85vh;
             }
 
             .category-filter {
@@ -158,6 +159,15 @@
             .delete-btn {
                 width: auto;
                 padding: 10px 20px;
+            }
+            
+            .symbol-buttons {
+                grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            }
+            
+            .symbol-btn {
+                font-size: 14px;
+                padding: 10px 2px;
             }
         }
 
@@ -235,6 +245,8 @@
             padding: 30px;
             width: 90%;
             max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
             border-radius: 12px;
             position: relative;
             animation: slideIn 0.3s ease-out;
@@ -398,9 +410,9 @@
 </head>
 <body>
     <div class="container">
-        <h1>📐 FormularioMat</h1>
+        <h1>📐 MALEmaticApp</h1>
         <p class="subtitle">Il tuo assistente per memorizzare le formule matematiche</p>
-        <p class="subtitle" style="font-size: 0.9em; margin-top: -10px; color: #999;">Sviluppato da Antonio Moliterni (alias Ananasso Malvagio)</p>
+        <p class="subtitle" style="font-size: 0.9em; margin-top: -10px; color: #999;">Sviluppato (MALE) da Antonio Moliterni (alias Ananasso Malvagio)</p>
 
         <div class="controls">
             <button onclick="openModal()">➕ Aggiungi Formula</button>
@@ -498,7 +510,9 @@
                     </div>
                 </div>
                 
-                <div class="latex-preview" id="latexPreview"></div>
+                <div class="latex-preview" id="latexPreview">
+                    <p style="color: #999; font-style: italic;">La formula apparirà qui...</p>
+                </div>
             </div>
 
             <div class="form-group">
@@ -627,6 +641,13 @@
                 const filtered = formulas.filter(f => f.category === category);
                 displayFormulas(filtered);
             }
+            
+            // Forza il re-rendering delle formule dopo il filtro
+            setTimeout(() => {
+                if (window.MathJax) {
+                    MathJax.typesetPromise().catch((e) => console.log(e));
+                }
+            }, 100);
         }
 
         // Cerca formule
