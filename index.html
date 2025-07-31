@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MALEmaticApp - Memorizza le Formule Matematiche</title>
     <link rel="icon" type="image/png" href="icon.png">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
     <style>
         * {
@@ -308,6 +319,7 @@
             margin-top: 10px;
             text-align: center;
             min-height: 50px;
+            font-size: 1.2em;
         }
 
         .category-filter {
@@ -535,14 +547,6 @@
     </div>
 
     <script>
-        // Configurazione MathJax
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']]
-            }
-        };
-
         // Array per memorizzare le formule
         let formulas = [];
 
@@ -682,13 +686,17 @@
         function updatePreview() {
             const latex = document.getElementById('formulaLatex').value;
             const preview = document.getElementById('latexPreview');
+            
             if (latex) {
                 preview.innerHTML = `\\[${latex}\\]`;
-                if (window.MathJax) {
-                    MathJax.typesetPromise([preview]).catch((e) => console.log(e));
+                // Forza MathJax a renderizzare immediatamente
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    window.MathJax.typesetPromise([preview]).then(() => {
+                        // Formula renderizzata con successo
+                    }).catch((e) => console.log(e));
                 }
             } else {
-                preview.innerHTML = '';
+                preview.innerHTML = '<p style="color: #999; font-style: italic;">La formula apparirà qui...</p>';
             }
         }
 
@@ -741,7 +749,7 @@
             document.getElementById('formulaDescription').value = '';
             document.getElementById('formulaUsage').value = '';
             document.getElementById('formulaExample').value = '';
-            document.getElementById('latexPreview').innerHTML = '';
+            document.getElementById('latexPreview').innerHTML = '<p style="color: #999; font-style: italic;">La formula apparirà qui...</p>';
         }
 
         // Chiudi modal cliccando fuori
@@ -751,9 +759,6 @@
                 closeModal();
             }
         }
-
-        // Carica formule all'avvio
-        loadFormulas();
 
         // Funzioni per l'editor LaTeX integrato
         function insertSymbol(symbol) {
@@ -791,6 +796,11 @@
                 select.value = ''; // Reset del select
             }
         }
+
+        // Carica formule all'avvio
+        window.addEventListener('DOMContentLoaded', function() {
+            loadFormulas();
+        });
     </script>
 </body>
 </html>
