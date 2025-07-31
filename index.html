@@ -611,10 +611,12 @@
                 </div>
             `).join('');
 
-            // Renderizza le formule LaTeX
-            if (window.MathJax) {
-                MathJax.typesetPromise().catch((e) => console.log(e));
-            }
+            // Renderizza le formule LaTeX - IMPORTANTE: aspetta che il DOM sia aggiornato
+            setTimeout(() => {
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    MathJax.typesetPromise().catch((e) => console.log(e));
+                }
+            }, 50);
         }
 
         // Aggiorna le categorie disponibili
@@ -641,13 +643,6 @@
                 const filtered = formulas.filter(f => f.category === category);
                 displayFormulas(filtered);
             }
-            
-            // Forza il re-rendering delle formule dopo il filtro
-            setTimeout(() => {
-                if (window.MathJax) {
-                    MathJax.typesetPromise().catch((e) => console.log(e));
-                }
-            }, 100);
         }
 
         // Cerca formule
@@ -684,11 +679,14 @@
             const preview = document.getElementById('latexPreview');
             if (latex) {
                 preview.innerHTML = `\\[${latex}\\]`;
-                if (window.MathJax) {
-                    MathJax.typesetPromise([preview]).catch((e) => console.log(e));
-                }
+                // Aspetta che il DOM sia aggiornato prima di chiamare MathJax
+                setTimeout(() => {
+                    if (window.MathJax && window.MathJax.typesetPromise) {
+                        MathJax.typesetPromise([preview]).catch((e) => console.log(e));
+                    }
+                }, 10);
             } else {
-                preview.innerHTML = '';
+                preview.innerHTML = '<p style="color: #999; font-style: italic;">La formula apparirà qui...</p>';
             }
         }
 
@@ -753,7 +751,15 @@
         }
 
         // Carica formule all'avvio
-        loadFormulas();
+        window.addEventListener('load', function() {
+            loadFormulas();
+            // Assicuriamoci che MathJax sia pronto
+            if (window.MathJax) {
+                MathJax.startup.promise.then(() => {
+                    MathJax.typesetPromise().catch((e) => console.log(e));
+                });
+            }
+        });
 
         // Funzioni per l'editor LaTeX integrato
         function insertSymbol(symbol) {
