@@ -414,7 +414,7 @@
                 <div class="formula-card">
                     <div class="formula-title">${formula.title}</div>
                     <div class="category-tag" style="display: inline-block; margin-bottom: 10px;">${formula.category}</div>
-                    <div class="formula-latex">$$${formula.latex}$$</div>
+                    <div class="formula-latex">\\[${formula.latex}\\]</div>
                     <div class="formula-description">${formula.description}</div>
                     <div class="formula-usage"><strong>📌 Quando si usa:</strong><br>${formula.usage}</div>
                     <div class="formula-example"><strong>📝 Esempio:</strong><br>${formula.example}</div>
@@ -423,7 +423,9 @@
             `).join('');
 
             // Renderizza le formule LaTeX
-            MathJax.typesetPromise();
+            if (window.MathJax) {
+                MathJax.typesetPromise().catch((e) => console.log(e));
+            }
         }
 
         // Aggiorna le categorie disponibili
@@ -485,8 +487,10 @@
             const latex = document.getElementById('formulaLatex').value;
             const preview = document.getElementById('latexPreview');
             if (latex) {
-                preview.innerHTML = `$$${latex}$$`;
-                MathJax.typesetPromise([preview]);
+                preview.innerHTML = `\\[${latex}\\]`;
+                if (window.MathJax) {
+                    MathJax.typesetPromise([preview]).catch((e) => console.log(e));
+                }
             } else {
                 preview.innerHTML = '';
             }
