@@ -1206,8 +1206,8 @@
             reader.readAsText(file);
         }
 
-        // NUOVE FUNZIONI: PDF e Stampa
-        function generatePDF() {
+        // NUOVE FUNZIONI: PDF e Stampa (AGGIORNATE con rendering MathJax)
+        async function generatePDF() {
             if (formulas.length === 0) {
                 showMessage('❌ Nessuna formula da esportare in PDF!', 'error');
                 return;
@@ -1215,97 +1215,216 @@
             
             showMessage('📑 Generazione PDF in corso...', 'info');
             
-            // Usa jsPDF per creare il PDF
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            let yPosition = 20;
-            const pageHeight = doc.internal.pageSize.height;
-            const margin = 20;
-            
-            // Titolo
-            doc.setFontSize(20);
-            doc.setFont(undefined, 'bold');
-            doc.text('📐 Formulario Matematico', margin, yPosition);
-            yPosition += 15;
-            
-            doc.setFontSize(12);
-            doc.setFont(undefined, 'normal');
-            doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, margin, yPosition);
-            yPosition += 20;
-            
-            // Raggruppa per categoria
-            const formulasByCategory = {};
-            formulas.forEach(formula => {
-                if (!formulasByCategory[formula.category]) {
-                    formulasByCategory[formula.category] = [];
-                }
-                formulasByCategory[formula.category].push(formula);
-            });
-            
-            // Genera PDF per categoria
-            Object.keys(formulasByCategory).forEach(category => {
-                // Controllo spazio per categoria
-                if (yPosition > pageHeight - 60) {
-                    doc.addPage();
-                    yPosition = 20;
-                }
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
                 
-                // Titolo categoria
-                doc.setFontSize(16);
+                let yPosition = 20;
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+                const margin = 20;
+                
+                // Titolo con logo (se disponibile)
+                doc.setFontSize(20);
                 doc.setFont(undefined, 'bold');
-                doc.text(category, margin, yPosition);
-                yPosition += 10;
+                doc.text('📐 Formulario Matematico MALEmatica', margin, yPosition);
+                yPosition += 15;
                 
-                // Formule della categoria
-                formulasByCategory[category].forEach(formula => {
-                    // Controllo spazio per formula
-                    if (yPosition > pageHeight - 80) {
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'normal');
+                doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, margin, yPosition);
+                doc.text(`Totale formule: ${formulas.length}`, margin, yPosition + 6);
+                yPosition += 25;
+                
+                // Raggruppa per categoria
+                const formulasByCategory = {};
+                formulas.forEach(formula => {
+                    if (!formulasByCategory[formula.category]) {
+                        formulasByCategory[formula.category] = [];
+                    }
+                    formulasByCategory[formula.category].push(formula);
+                });
+                
+                // Genera PDF per categoria
+                for (const category of Object.keys(formulasByCategory)) {
+                    // Controllo spazio per categoria
+                    if (yPosition > pageHeight - 60) {
                         doc.addPage();
                         yPosition = 20;
                     }
                     
-                    doc.setFontSize(14);
+                    // Titolo categoria
+                    doc.setFontSize(16);
                     doc.setFont(undefined, 'bold');
-                    doc.text(formula.title, margin, yPosition);
-                    yPosition += 8;
+                    doc.setTextColor(102, 126, 234); // Colore del tema
+                    doc.text(category, margin, yPosition);
+                    doc.setTextColor(0, 0, 0); // Reset colore
+                    yPosition += 12;
                     
-                    doc.setFontSize(10);
-                    doc.setFont(undefined, 'normal');
-                    
-                    // LaTeX (semplificato - rimuovi comandi LaTeX)
-                    const simplifiedLatex = formula.latex
-                        .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)')
-                        .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
-                        .replace(/\\\w+/g, '') // Rimuovi altri comandi LaTeX
-                        .replace(/[{}]/g, '');
-                    
-                    doc.text(`Formula: ${simplifiedLatex}`, margin, yPosition);
-                    yPosition += 6;
-                    
-                    if (formula.description) {
-                        const desc = doc.splitTextToSize(formula.description, 170);
-                        doc.text(desc, margin, yPosition);
-                        yPosition += desc.length * 4;
-                    }
-                    
-                    if (formula.usage) {
-                        doc.setFont(undefined, 'italic');
-                        const usage = doc.splitTextToSize(`Quando si usa: ${formula.usage}`, 170);
-                        doc.text(usage, margin, yPosition);
-                        yPosition += usage.length * 4;
+                    // Formule della categoria
+                    for (const formula of formulasByCategory[category]) {
+                        // Controllo spazio per formula
+                        if (yPosition > pageHeight - 100) {
+                            doc.addPage();
+                            yPosition = 20;
+                        }
+                        
+                        // Nome formula
+                        doc.setFontSize(14);
+                        doc.setFont(undefined, 'bold');
+                        doc.text(formula.title, margin, yPosition);
+                        yPosition += 10;
+                        
+                        // Renderizza formula matematica come immagine
+                        try {
+                            const formulaImage = await renderFormulaToImage(formula.latex);
+                            if (formulaImage) {
+                                const imgWidth = 100;
+                                const imgHeight = 30;
+                                doc.addImage(formulaImage, 'PNG', margin, yPosition, imgWidth, imgHeight);
+                                yPosition += imgHeight + 5;
+                            } else {
+                                // Fallback: testo semplificato
+                                doc.setFontSize(12);
+                                doc.setFont(undefined, 'normal');
+                                const simplifiedLatex = simplifyLatexForPrint(formula.latex);
+                                doc.text(`Formula: ${simplifiedLatex}`, margin, yPosition);
+                                yPosition += 8;
+                            }
+                        } catch (error) {
+                            console.log('Errore rendering formula:', error);
+                            // Fallback: testo semplificato
+                            doc.setFontSize(12);
+                            doc.setFont(undefined, 'normal');
+                            const simplifiedLatex = simplifyLatexForPrint(formula.latex);
+                            doc.text(`Formula: ${simplifiedLatex}`, margin, yPosition);
+                            yPosition += 8;
+                        }
+                        
+                        doc.setFontSize(10);
                         doc.setFont(undefined, 'normal');
+                        
+                        // Descrizione
+                        if (formula.description) {
+                            const desc = doc.splitTextToSize(`Descrizione: ${formula.description}`, pageWidth - 2 * margin);
+                            doc.text(desc, margin, yPosition);
+                            yPosition += desc.length * 4 + 2;
+                        }
+                        
+                        // Quando si usa
+                        if (formula.usage) {
+                            doc.setFont(undefined, 'italic');
+                            const usage = doc.splitTextToSize(`Quando si usa: ${formula.usage}`, pageWidth - 2 * margin);
+                            doc.text(usage, margin, yPosition);
+                            yPosition += usage.length * 4 + 2;
+                            doc.setFont(undefined, 'normal');
+                        }
+                        
+                        // Esempio
+                        if (formula.example) {
+                            doc.setFont(undefined, 'normal');
+                            const example = doc.splitTextToSize(`Esempio: ${formula.example}`, pageWidth - 2 * margin);
+                            doc.text(example, margin, yPosition);
+                            yPosition += example.length * 4;
+                        }
+                        
+                        yPosition += 12; // Spazio tra formule
                     }
                     
-                    yPosition += 8; // Spazio tra formule
-                });
+                    yPosition += 8; // Spazio tra categorie
+                }
                 
-                yPosition += 5; // Spazio tra categorie
+                // Footer
+                const totalPages = doc.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(128, 128, 128);
+                    doc.text(`MALEmaticApp - Pagina ${i} di ${totalPages}`, pageWidth - 60, pageHeight - 10);
+                }
+                
+                // Salva PDF
+                doc.save(`formulario_matematica_${new Date().toISOString().split('T')[0]}.pdf`);
+                showMessage('✅ PDF generato con formule renderizzate!', 'success');
+                
+            } catch (error) {
+                console.error('Errore generazione PDF:', error);
+                showMessage('❌ Errore durante la generazione del PDF: ' + error.message, 'error');
+            }
+        }
+
+        // Funzione per renderizzare formula LaTeX come immagine
+        async function renderFormulaToImage(latex) {
+            return new Promise((resolve) => {
+                try {
+                    // Crea elemento temporaneo per il rendering
+                    const tempDiv = document.createElement('div');
+                    tempDiv.style.position = 'absolute';
+                    tempDiv.style.left = '-9999px';
+                    tempDiv.style.fontSize = '20px';
+                    tempDiv.style.padding = '10px';
+                    tempDiv.style.backgroundColor = 'white';
+                    tempDiv.innerHTML = `\\[${latex}\\]`;
+                    
+                    document.body.appendChild(tempDiv);
+                    
+                    // Renderizza con MathJax
+                    if (window.MathJax && window.MathJax.typesetPromise) {
+                        window.MathJax.typesetPromise([tempDiv]).then(() => {
+                            // Converti in canvas
+                            html2canvas(tempDiv, {
+                                backgroundColor: 'white',
+                                scale: 2,
+                                useCORS: true
+                            }).then(canvas => {
+                                const imgData = canvas.toDataURL('image/png');
+                                document.body.removeChild(tempDiv);
+                                resolve(imgData);
+                            }).catch(() => {
+                                document.body.removeChild(tempDiv);
+                                resolve(null);
+                            });
+                        }).catch(() => {
+                            document.body.removeChild(tempDiv);
+                            resolve(null);
+                        });
+                    } else {
+                        document.body.removeChild(tempDiv);
+                        resolve(null);
+                    }
+                } catch (error) {
+                    resolve(null);
+                }
             });
-            
-            // Salva PDF
-            doc.save(`formulario_matematica_${new Date().toISOString().split('T')[0]}.pdf`);
-            showMessage('✅ PDF generato e scaricato con successo!', 'success');
+        }
+
+        // Funzione per semplificare LaTeX per stampa (fallback)
+        function simplifyLatexForPrint(latex) {
+            return latex
+                .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)')
+                .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
+                .replace(/\\pm/g, '±')
+                .replace(/\\cdot/g, '·')
+                .replace(/\\div/g, '÷')
+                .replace(/\\neq/g, '≠')
+                .replace(/\\leq/g, '≤')
+                .replace(/\\geq/g, '≥')
+                .replace(/\\alpha/g, 'α')
+                .replace(/\\beta/g, 'β')
+                .replace(/\\gamma/g, 'γ')
+                .replace(/\\delta/g, 'δ')
+                .replace(/\\pi/g, 'π')
+                .replace(/\\theta/g, 'θ')
+                .replace(/\\lambda/g, 'λ')
+                .replace(/\\mu/g, 'μ')
+                .replace(/\\infty/g, '∞')
+                .replace(/\\sum/g, '∑')
+                .replace(/\\int/g, '∫')
+                .replace(/\\partial/g, '∂')
+                .replace(/\\rightarrow/g, '→')
+                .replace(/\\leftarrow/g, '←')
+                .replace(/\\\w+/g, '') // Rimuovi altri comandi LaTeX
+                .replace(/[{}]/g, ''); // Rimuovi graffe
         }
 
         function printFormulas() {
