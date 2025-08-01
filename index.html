@@ -17,7 +17,8 @@
         };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -68,6 +69,11 @@
             animation: logoFloat 3s ease-in-out infinite;
         }
 
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
         .logo:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
@@ -100,6 +106,191 @@
             color: #666;
             margin-bottom: 30px;
             font-size: 1.1em;
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 10px;
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: rgba(255, 255, 255, 0.7);
+            color: #667eea;
+            border: 2px solid transparent;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .tab-button:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Calculator Styles */
+        .calculator-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .calculator {
+            background: #f5f5f5;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .calc-display {
+            background: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 15px;
+            min-height: 60px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 20px 10px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .calc-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .calc-btn:active {
+            transform: translateY(0);
+        }
+
+        .calc-btn.number {
+            background: #e8f4f8;
+            font-weight: bold;
+        }
+
+        .calc-btn.operator {
+            background: #667eea;
+            color: white;
+        }
+
+        .calc-btn.function {
+            background: #764ba2;
+            color: white;
+            font-size: 14px;
+        }
+
+        .calc-btn.clear {
+            background: #ff6b6b;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .calc-btn.equals {
+            background: #4CAF50;
+            color: white;
+            grid-column: span 2;
+        }
+
+        /* Graph Section */
+        .graph-section {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .graph-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .graph-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            min-width: 200px;
+        }
+
+        .graph-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #plotArea {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .function-list {
+            margin-top: 15px;
+        }
+
+        .function-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .function-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: inline-block;
         }
 
         .controls {
@@ -144,15 +335,6 @@
 
         .btn-secondary:hover {
             box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
-            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
-        }
-
-        .btn-warning:hover {
-            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
         }
 
         .btn-info {
@@ -201,6 +383,14 @@
 
             .subtitle {
                 font-size: 1em;
+            }
+
+            .tab-navigation {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
             }
 
             .controls, .advanced-controls {
@@ -262,6 +452,19 @@
             .symbol-btn {
                 font-size: 14px;
                 padding: 10px 2px;
+            }
+
+            .calc-buttons {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .calc-btn {
+                padding: 15px 5px;
+                font-size: 16px;
+            }
+
+            .calc-btn.function {
+                font-size: 12px;
             }
         }
 
@@ -730,7 +933,7 @@
                 padding: 20px;
             }
             
-            .controls, .advanced-controls, .category-filter {
+            .tab-navigation, .controls, .advanced-controls, .category-filter {
                 display: none;
             }
             
@@ -745,23 +948,12 @@
                 display: none;
             }
         }
-
-        @media (max-width: 768px) {
-            .symbol-buttons {
-                grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-            }
-            
-            .symbol-btn {
-                font-size: 14px;
-                padding: 10px 2px;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>
-            <img src="icon.png" alt="MALEmatica Logo" class="logo">
+            <img src="icon.png" alt="MALEmatica Logo" class="logo" onerror="this.style.display='none'">
             📐 MALEmaticApp
         </h1>
         <p class="subtitle">Il tuo assistente per memorizzare le formule matematiche</p>
@@ -773,33 +965,116 @@
             </a>
         </p>
 
-        <div class="controls">
-            <button onclick="openModal()">➕ Aggiungi Formula</button>
-            <input type="text" class="search-box" id="searchBox" placeholder="Cerca formule per nome, utilizzo o argomento..." onkeyup="searchFormulas()">
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="switchTab('formulas')">📚 Formulario</button>
+            <button class="tab-button" onclick="switchTab('calculator')">🧮 Calcolatrice</button>
         </div>
 
-        <!-- Nuovi controlli avanzati -->
-        <div class="advanced-controls">
-            <button class="btn-secondary" onclick="exportFormulas()">📤 Esporta Formule</button>
-            <label for="importFile" class="file-input-custom">📥 Importa Formule</label>
-            <input type="file" id="importFile" accept=".json" onchange="importFormulas()" style="display: none;">
-            <button class="btn-warning" onclick="generatePDF()">📑 Genera PDF</button>
-            <button class="btn-info" onclick="printFormulas()">🖨️ Stampa</button>
+        <!-- Formulas Tab -->
+        <div id="formulas-tab" class="tab-content active">
+            <div class="controls">
+                <button onclick="openModal()">➕ Aggiungi Formula</button>
+                <input type="text" class="search-box" id="searchBox" placeholder="Cerca formule per nome, utilizzo o argomento..." onkeyup="searchFormulas()">
+            </div>
+
+            <!-- Controlli avanzati aggiornati -->
+            <div class="advanced-controls">
+                <button class="btn-secondary" onclick="exportFormulas()">📤 Esporta Formule</button>
+                <label for="importFile" class="file-input-custom">📥 Importa Formule</label>
+                <input type="file" id="importFile" accept=".json" onchange="importFormulas()" style="display: none;">
+                <button class="btn-info" onclick="printFormulas()">🖨️ Stampa/PDF</button>
+            </div>
+
+            <div id="messageContainer"></div>
+
+            <div class="category-filter" id="categoryFilter">
+                <div class="category-tag active" onclick="filterByCategory('all')">Tutte</div>
+            </div>
+
+            <div class="formulas-grid" id="formulasGrid">
+                <!-- Le formule verranno aggiunte qui dinamicamente -->
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <h3>Nessuna formula trovata</h3>
+                <p>Clicca su "Aggiungi Formula" per iniziare a creare il tuo formulario personalizzato!</p>
+            </div>
         </div>
 
-        <div id="messageContainer"></div>
+        <!-- Calculator Tab -->
+        <div id="calculator-tab" class="tab-content">
+            <div class="calculator-container">
+                <div class="calculator">
+                    <div class="calc-display" id="calcDisplay">0</div>
+                    
+                    <div class="calc-buttons">
+                        <!-- Scientific Functions Row 1 -->
+                        <button class="calc-btn function" onclick="addToDisplay('sin(')">sin</button>
+                        <button class="calc-btn function" onclick="addToDisplay('cos(')">cos</button>
+                        <button class="calc-btn function" onclick="addToDisplay('tan(')">tan</button>
+                        <button class="calc-btn function" onclick="addToDisplay('log(')">log</button>
+                        <button class="calc-btn function" onclick="addToDisplay('ln(')">ln</button>
+                        
+                        <!-- Scientific Functions Row 2 -->
+                        <button class="calc-btn function" onclick="addToDisplay('sqrt(')">√</button>
+                        <button class="calc-btn function" onclick="addToDisplay('^')">x^y</button>
+                        <button class="calc-btn function" onclick="addToDisplay('pi')">π</button>
+                        <button class="calc-btn function" onclick="addToDisplay('e')">e</button>
+                        <button class="calc-btn function" onclick="addToDisplay('abs(')">|x|</button>
+                        
+                        <!-- Numbers and Basic Operations -->
+                        <button class="calc-btn clear" onclick="clearDisplay()">C</button>
+                        <button class="calc-btn operator" onclick="deleteLastChar()">⌫</button>
+                        <button class="calc-btn operator" onclick="addToDisplay('(')">(</button>
+                        <button class="calc-btn operator" onclick="addToDisplay(')')">)</button>
+                        <button class="calc-btn operator" onclick="addToDisplay('/')">÷</button>
+                        
+                        <button class="calc-btn number" onclick="addToDisplay('7')">7</button>
+                        <button class="calc-btn number" onclick="addToDisplay('8')">8</button>
+                        <button class="calc-btn number" onclick="addToDisplay('9')">9</button>
+                        <button class="calc-btn operator" onclick="addToDisplay('*')">×</button>
+                        <button class="calc-btn function" onclick="addToDisplay('!')">!</button>
+                        
+                        <button class="calc-btn number" onclick="addToDisplay('4')">4</button>
+                        <button class="calc-btn number" onclick="addToDisplay('5')">5</button>
+                        <button class="calc-btn number" onclick="addToDisplay('6')">6</button>
+                        <button class="calc-btn operator" onclick="addToDisplay('-')">-</button>
+                        <button class="calc-btn function" onclick="addToDisplay('%')">%</button>
+                        
+                        <button class="calc-btn number" onclick="addToDisplay('1')">1</button>
+                        <button class="calc-btn number" onclick="addToDisplay('2')">2</button>
+                        <button class="calc-btn number" onclick="addToDisplay('3')">3</button>
+                        <button class="calc-btn operator" onclick="addToDisplay('+')">+</button>
+                        <button class="calc-btn equals" onclick="calculate()">=</button>
+                        
+                        <button class="calc-btn number" onclick="addToDisplay('0')">0</button>
+                        <button class="calc-btn number" onclick="addToDisplay('.')">.</button>
+                        <button class="calc-btn operator" onclick="addToDisplay(',')">,</button>
+                    </div>
+                </div>
 
-        <div class="category-filter" id="categoryFilter">
-            <div class="category-tag active" onclick="filterByCategory('all')">Tutte</div>
-        </div>
+                <!-- Graph Section -->
+                <div class="graph-section">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📊 Grafico Funzioni</h3>
+                    
+                    <div class="graph-controls">
+                        <input type="text" class="graph-input" id="functionInput" placeholder="Inserisci una funzione, es: sin(x), x^2, log(x)">
+                        <button onclick="addFunction()">➕ Aggiungi Funzione</button>
+                        <button class="btn-secondary" onclick="clearGraph()">🗑️ Pulisci Grafico</button>
+                    </div>
 
-        <div class="formulas-grid" id="formulasGrid">
-            <!-- Le formule verranno aggiunte qui dinamicamente -->
-        </div>
+                    <div id="plotArea"></div>
 
-        <div class="empty-state" id="emptyState" style="display: none;">
-            <h3>Nessuna formula trovata</h3>
-            <p>Clicca su "Aggiungi Formula" per iniziare a creare il tuo formulario personalizzato!</p>
+                    <div class="function-list" id="functionList"></div>
+
+                    <div style="margin-top: 15px;">
+                        <p class="help-text">
+                            <strong>Suggerimenti:</strong> Usa x come variabile. Esempi: sin(x), cos(x), x^2, x^3, sqrt(x), log(x), exp(x), 2*x+1
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -960,6 +1235,242 @@
         let formulas = [];
         let currentLinks = [];
         let editingFormulaId = null;
+        let plotlyFunctions = [];
+        let functionColors = ['#667eea', '#764ba2', '#ff6b6b', '#4CAF50', '#ff8c00', '#17a2b8'];
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            // Remove active class from all tabs and buttons
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add active class to selected tab and button
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.target.classList.add('active');
+
+            // Initialize graph if switching to calculator tab
+            if (tabName === 'calculator' && plotlyFunctions.length === 0) {
+                initializeGraph();
+            }
+        }
+
+        // Calculator Functions
+        let calcDisplay = '0';
+        let lastResult = '0';
+
+        function updateCalcDisplay() {
+            document.getElementById('calcDisplay').textContent = calcDisplay;
+        }
+
+        function addToDisplay(value) {
+            if (calcDisplay === '0' && value !== '.') {
+                calcDisplay = value;
+            } else {
+                calcDisplay += value;
+            }
+            updateCalcDisplay();
+        }
+
+        function clearDisplay() {
+            calcDisplay = '0';
+            updateCalcDisplay();
+        }
+
+        function deleteLastChar() {
+            if (calcDisplay.length > 1) {
+                calcDisplay = calcDisplay.slice(0, -1);
+            } else {
+                calcDisplay = '0';
+            }
+            updateCalcDisplay();
+        }
+
+        function calculate() {
+            try {
+                // Replace display symbols with math.js compatible ones
+                let expression = calcDisplay
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/π/g, 'pi')
+                    .replace(/e/g, 'e')
+                    .replace(/ln/g, 'log')
+                    .replace(/log/g, 'log10');
+
+                // Evaluate using math.js
+                let result = math.evaluate(expression);
+                
+                // Format result
+                if (typeof result === 'number') {
+                    result = Math.round(result * 10000000000) / 10000000000; // 10 decimal places
+                }
+                
+                lastResult = result.toString();
+                calcDisplay = lastResult;
+                updateCalcDisplay();
+            } catch (error) {
+                calcDisplay = 'Errore';
+                updateCalcDisplay();
+                setTimeout(() => {
+                    calcDisplay = '0';
+                    updateCalcDisplay();
+                }, 2000);
+            }
+        }
+
+        // Graph Functions
+        function initializeGraph() {
+            const layout = {
+                title: 'Grafico Funzioni',
+                xaxis: {
+                    title: 'x',
+                    gridcolor: '#e0e0e0',
+                    zerolinecolor: '#333',
+                    range: [-10, 10]
+                },
+                yaxis: {
+                    title: 'y',
+                    gridcolor: '#e0e0e0',
+                    zerolinecolor: '#333',
+                    range: [-10, 10]
+                },
+                plot_bgcolor: '#fafafa',
+                paper_bgcolor: '#ffffff',
+                showlegend: true
+            };
+
+            Plotly.newPlot('plotArea', [], layout);
+        }
+
+        function addFunction() {
+            const functionInput = document.getElementById('functionInput').value;
+            if (!functionInput) {
+                alert('Inserisci una funzione!');
+                return;
+            }
+
+            try {
+                // Generate x values
+                const xValues = [];
+                for (let x = -10; x <= 10; x += 0.1) {
+                    xValues.push(x);
+                }
+
+                // Calculate y values
+                const yValues = xValues.map(x => {
+                    try {
+                        return math.evaluate(functionInput, { x: x });
+                    } catch {
+                        return null;
+                    }
+                });
+
+                // Choose color
+                const colorIndex = plotlyFunctions.length % functionColors.length;
+                const color = functionColors[colorIndex];
+
+                // Add trace to plot
+                const trace = {
+                    x: xValues,
+                    y: yValues,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: functionInput,
+                    line: {
+                        color: color,
+                        width: 2
+                    }
+                };
+
+                plotlyFunctions.push({
+                    expression: functionInput,
+                    color: color,
+                    trace: trace
+                });
+
+                // Update plot
+                const traces = plotlyFunctions.map(f => f.trace);
+                Plotly.newPlot('plotArea', traces, {
+                    title: 'Grafico Funzioni',
+                    xaxis: {
+                        title: 'x',
+                        gridcolor: '#e0e0e0',
+                        zerolinecolor: '#333',
+                        range: [-10, 10]
+                    },
+                    yaxis: {
+                        title: 'y',
+                        gridcolor: '#e0e0e0',
+                        zerolinecolor: '#333',
+                        range: [-10, 10]
+                    },
+                    plot_bgcolor: '#fafafa',
+                    paper_bgcolor: '#ffffff',
+                    showlegend: true
+                });
+
+                // Update function list
+                updateFunctionList();
+
+                // Clear input
+                document.getElementById('functionInput').value = '';
+
+            } catch (error) {
+                alert('Errore nella funzione. Controlla la sintassi!');
+            }
+        }
+
+        function updateFunctionList() {
+            const functionList = document.getElementById('functionList');
+            functionList.innerHTML = plotlyFunctions.map((func, index) => `
+                <div class="function-item">
+                    <div>
+                        <span class="function-color" style="background-color: ${func.color}"></span>
+                        <strong>f(x) = ${func.expression}</strong>
+                    </div>
+                    <button class="remove-link" onclick="removeFunction(${index})">🗑️ Rimuovi</button>
+                </div>
+            `).join('');
+        }
+
+        function removeFunction(index) {
+            plotlyFunctions.splice(index, 1);
+            
+            if (plotlyFunctions.length === 0) {
+                initializeGraph();
+            } else {
+                const traces = plotlyFunctions.map(f => f.trace);
+                Plotly.newPlot('plotArea', traces, {
+                    title: 'Grafico Funzioni',
+                    xaxis: {
+                        title: 'x',
+                        gridcolor: '#e0e0e0',
+                        zerolinecolor: '#333',
+                        range: [-10, 10]
+                    },
+                    yaxis: {
+                        title: 'y',
+                        gridcolor: '#e0e0e0',
+                        zerolinecolor: '#333',
+                        range: [-10, 10]
+                    },
+                    plot_bgcolor: '#fafafa',
+                    paper_bgcolor: '#ffffff',
+                    showlegend: true
+                });
+            }
+            
+            updateFunctionList();
+        }
+
+        function clearGraph() {
+            plotlyFunctions = [];
+            initializeGraph();
+            updateFunctionList();
+        }
 
         // Carica formule salvate
         function loadFormulas() {
@@ -1206,227 +1717,7 @@
             reader.readAsText(file);
         }
 
-        // NUOVE FUNZIONI: PDF e Stampa (AGGIORNATE con rendering MathJax)
-        async function generatePDF() {
-            if (formulas.length === 0) {
-                showMessage('❌ Nessuna formula da esportare in PDF!', 'error');
-                return;
-            }
-            
-            showMessage('📑 Generazione PDF in corso...', 'info');
-            
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                let yPosition = 20;
-                const pageHeight = doc.internal.pageSize.height;
-                const pageWidth = doc.internal.pageSize.width;
-                const margin = 20;
-                
-                // Titolo con logo (se disponibile)
-                doc.setFontSize(20);
-                doc.setFont(undefined, 'bold');
-                doc.text('📐 Formulario Matematico MALEmatica', margin, yPosition);
-                yPosition += 15;
-                
-                doc.setFontSize(12);
-                doc.setFont(undefined, 'normal');
-                doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, margin, yPosition);
-                doc.text(`Totale formule: ${formulas.length}`, margin, yPosition + 6);
-                yPosition += 25;
-                
-                // Raggruppa per categoria
-                const formulasByCategory = {};
-                formulas.forEach(formula => {
-                    if (!formulasByCategory[formula.category]) {
-                        formulasByCategory[formula.category] = [];
-                    }
-                    formulasByCategory[formula.category].push(formula);
-                });
-                
-                // Genera PDF per categoria
-                for (const category of Object.keys(formulasByCategory)) {
-                    // Controllo spazio per categoria
-                    if (yPosition > pageHeight - 60) {
-                        doc.addPage();
-                        yPosition = 20;
-                    }
-                    
-                    // Titolo categoria
-                    doc.setFontSize(16);
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(102, 126, 234); // Colore del tema
-                    doc.text(category, margin, yPosition);
-                    doc.setTextColor(0, 0, 0); // Reset colore
-                    yPosition += 12;
-                    
-                    // Formule della categoria
-                    for (const formula of formulasByCategory[category]) {
-                        // Controllo spazio per formula
-                        if (yPosition > pageHeight - 100) {
-                            doc.addPage();
-                            yPosition = 20;
-                        }
-                        
-                        // Nome formula
-                        doc.setFontSize(14);
-                        doc.setFont(undefined, 'bold');
-                        doc.text(formula.title, margin, yPosition);
-                        yPosition += 10;
-                        
-                        // Renderizza formula matematica come immagine
-                        try {
-                            const formulaImage = await renderFormulaToImage(formula.latex);
-                            if (formulaImage) {
-                                const imgWidth = 100;
-                                const imgHeight = 30;
-                                doc.addImage(formulaImage, 'PNG', margin, yPosition, imgWidth, imgHeight);
-                                yPosition += imgHeight + 5;
-                            } else {
-                                // Fallback: testo semplificato
-                                doc.setFontSize(12);
-                                doc.setFont(undefined, 'normal');
-                                const simplifiedLatex = simplifyLatexForPrint(formula.latex);
-                                doc.text(`Formula: ${simplifiedLatex}`, margin, yPosition);
-                                yPosition += 8;
-                            }
-                        } catch (error) {
-                            console.log('Errore rendering formula:', error);
-                            // Fallback: testo semplificato
-                            doc.setFontSize(12);
-                            doc.setFont(undefined, 'normal');
-                            const simplifiedLatex = simplifyLatexForPrint(formula.latex);
-                            doc.text(`Formula: ${simplifiedLatex}`, margin, yPosition);
-                            yPosition += 8;
-                        }
-                        
-                        doc.setFontSize(10);
-                        doc.setFont(undefined, 'normal');
-                        
-                        // Descrizione
-                        if (formula.description) {
-                            const desc = doc.splitTextToSize(`Descrizione: ${formula.description}`, pageWidth - 2 * margin);
-                            doc.text(desc, margin, yPosition);
-                            yPosition += desc.length * 4 + 2;
-                        }
-                        
-                        // Quando si usa
-                        if (formula.usage) {
-                            doc.setFont(undefined, 'italic');
-                            const usage = doc.splitTextToSize(`Quando si usa: ${formula.usage}`, pageWidth - 2 * margin);
-                            doc.text(usage, margin, yPosition);
-                            yPosition += usage.length * 4 + 2;
-                            doc.setFont(undefined, 'normal');
-                        }
-                        
-                        // Esempio
-                        if (formula.example) {
-                            doc.setFont(undefined, 'normal');
-                            const example = doc.splitTextToSize(`Esempio: ${formula.example}`, pageWidth - 2 * margin);
-                            doc.text(example, margin, yPosition);
-                            yPosition += example.length * 4;
-                        }
-                        
-                        yPosition += 12; // Spazio tra formule
-                    }
-                    
-                    yPosition += 8; // Spazio tra categorie
-                }
-                
-                // Footer
-                const totalPages = doc.getNumberOfPages();
-                for (let i = 1; i <= totalPages; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(8);
-                    doc.setTextColor(128, 128, 128);
-                    doc.text(`MALEmaticApp - Pagina ${i} di ${totalPages}`, pageWidth - 60, pageHeight - 10);
-                }
-                
-                // Salva PDF
-                doc.save(`formulario_matematica_${new Date().toISOString().split('T')[0]}.pdf`);
-                showMessage('✅ PDF generato con formule renderizzate!', 'success');
-                
-            } catch (error) {
-                console.error('Errore generazione PDF:', error);
-                showMessage('❌ Errore durante la generazione del PDF: ' + error.message, 'error');
-            }
-        }
-
-        // Funzione per renderizzare formula LaTeX come immagine
-        async function renderFormulaToImage(latex) {
-            return new Promise((resolve) => {
-                try {
-                    // Crea elemento temporaneo per il rendering
-                    const tempDiv = document.createElement('div');
-                    tempDiv.style.position = 'absolute';
-                    tempDiv.style.left = '-9999px';
-                    tempDiv.style.fontSize = '20px';
-                    tempDiv.style.padding = '10px';
-                    tempDiv.style.backgroundColor = 'white';
-                    tempDiv.innerHTML = `\\[${latex}\\]`;
-                    
-                    document.body.appendChild(tempDiv);
-                    
-                    // Renderizza con MathJax
-                    if (window.MathJax && window.MathJax.typesetPromise) {
-                        window.MathJax.typesetPromise([tempDiv]).then(() => {
-                            // Converti in canvas
-                            html2canvas(tempDiv, {
-                                backgroundColor: 'white',
-                                scale: 2,
-                                useCORS: true
-                            }).then(canvas => {
-                                const imgData = canvas.toDataURL('image/png');
-                                document.body.removeChild(tempDiv);
-                                resolve(imgData);
-                            }).catch(() => {
-                                document.body.removeChild(tempDiv);
-                                resolve(null);
-                            });
-                        }).catch(() => {
-                            document.body.removeChild(tempDiv);
-                            resolve(null);
-                        });
-                    } else {
-                        document.body.removeChild(tempDiv);
-                        resolve(null);
-                    }
-                } catch (error) {
-                    resolve(null);
-                }
-            });
-        }
-
-        // Funzione per semplificare LaTeX per stampa (fallback)
-        function simplifyLatexForPrint(latex) {
-            return latex
-                .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)')
-                .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
-                .replace(/\\pm/g, '±')
-                .replace(/\\cdot/g, '·')
-                .replace(/\\div/g, '÷')
-                .replace(/\\neq/g, '≠')
-                .replace(/\\leq/g, '≤')
-                .replace(/\\geq/g, '≥')
-                .replace(/\\alpha/g, 'α')
-                .replace(/\\beta/g, 'β')
-                .replace(/\\gamma/g, 'γ')
-                .replace(/\\delta/g, 'δ')
-                .replace(/\\pi/g, 'π')
-                .replace(/\\theta/g, 'θ')
-                .replace(/\\lambda/g, 'λ')
-                .replace(/\\mu/g, 'μ')
-                .replace(/\\infty/g, '∞')
-                .replace(/\\sum/g, '∑')
-                .replace(/\\int/g, '∫')
-                .replace(/\\partial/g, '∂')
-                .replace(/\\rightarrow/g, '→')
-                .replace(/\\leftarrow/g, '←')
-                .replace(/\\\w+/g, '') // Rimuovi altri comandi LaTeX
-                .replace(/[{}]/g, ''); // Rimuovi graffe
-        }
-
+        // Funzione per stampare (che genera PDF)
         function printFormulas() {
             if (formulas.length === 0) {
                 showMessage('❌ Nessuna formula da stampare!', 'error');
@@ -1887,6 +2178,8 @@
         // Carica formule all'avvio
         window.addEventListener('DOMContentLoaded', function() {
             loadFormulas();
+            // Initialize calculator display
+            updateCalcDisplay();
         });
 
         // Gestione keyboard shortcuts
@@ -1907,6 +2200,12 @@
                     closeModal();
                 }
             }
+
+            // Enter per calcolare (solo se nella tab calcolatrice)
+            if (e.key === 'Enter' && document.getElementById('calculator-tab').classList.contains('active')) {
+                e.preventDefault();
+                calculate();
+            }
         });
 
         // Prevenire perdita dati se si chiude accidentalmente
@@ -1920,6 +2219,28 @@
                     e.preventDefault();
                     e.returnValue = 'Hai modifiche non salvate. Sei sicuro di voler uscire?';
                     return e.returnValue;
+                }
+            }
+        });
+
+        // Keyboard input for calculator
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('calculator-tab').classList.contains('active')) {
+                // Number keys
+                if (e.key >= '0' && e.key <= '9') {
+                    addToDisplay(e.key);
+                }
+                // Operators
+                else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/' || e.key === '.') {
+                    addToDisplay(e.key);
+                }
+                // Delete/Backspace
+                else if (e.key === 'Backspace') {
+                    deleteLastChar();
+                }
+                // Clear
+                else if (e.key === 'Escape') {
+                    clearDisplay();
                 }
             }
         });
