@@ -73,9 +73,26 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
 
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
+        /* Stili per il link YouTube */
+        .youtube-link {
+            color: #ff0000;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .youtube-link:hover {
+            color: #cc0000;
+            transform: scale(1.05);
+            background: rgba(255, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
         }
 
         .subtitle {
@@ -748,7 +765,13 @@
             📐 MALEmaticApp
         </h1>
         <p class="subtitle">Il tuo assistente per memorizzare le formule matematiche</p>
-        <p class="subtitle" style="font-size: 0.9em; margin-top: -10px; color: #999;">Sviluppato (MALE) da Antonio Moliterni (alias Ananasso Malvagio)</p>
+        <p class="subtitle" style="font-size: 0.9em; margin-top: -10px; color: #999;">
+            Sviluppato (MALE) da Antonio Moliterni (alias Ananasso Malvagio)
+            <br>
+            <a href="https://www.youtube.com/@malematica" target="_blank" class="youtube-link">
+                📺 Visita il canale YouTube MALEmatica
+            </a>
+        </p>
 
         <div class="controls">
             <button onclick="openModal()">➕ Aggiungi Formula</button>
