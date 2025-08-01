@@ -17,6 +17,7 @@
         };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -68,6 +69,17 @@
             flex-wrap: wrap;
         }
 
+        .advanced-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -83,6 +95,33 @@
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-warning:hover {
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+        }
+
+        .btn-info:hover {
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
         }
 
         .search-box {
@@ -124,7 +163,7 @@
                 font-size: 1em;
             }
 
-            .controls {
+            .controls, .advanced-controls {
                 flex-direction: column;
             }
 
@@ -167,9 +206,13 @@
                 padding: 14px;
             }
 
-            .delete-btn {
-                width: auto;
-                padding: 10px 20px;
+            .formula-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .formula-actions button {
+                width: 100%;
             }
             
             .symbol-buttons {
@@ -236,6 +279,20 @@
             border-radius: 8px;
             margin: 10px 0;
             font-family: 'Courier New', monospace;
+        }
+
+        .formula-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .formula-actions button {
+            padding: 8px 16px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 120px;
         }
 
         /* Nuovi stili per contenuti multimediali */
@@ -486,13 +543,18 @@
 
         .delete-btn {
             background: #ff4757;
-            padding: 8px 16px;
-            font-size: 14px;
-            margin-top: 10px;
         }
 
         .delete-btn:hover {
             background: #ff3838;
+        }
+
+        .edit-btn {
+            background: #ffa502;
+        }
+
+        .edit-btn:hover {
+            background: #ff9500;
         }
 
         /* Stili per l'editor LaTeX integrato */
@@ -580,6 +642,70 @@
             font-size: 12px;
         }
 
+        /* Stili per il file input personalizzato */
+        .file-input-custom {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .file-input-custom:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Stili per la stampa */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 20px;
+            }
+            
+            .controls, .advanced-controls, .category-filter {
+                display: none;
+            }
+            
+            .formula-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+                border: 1px solid #ccc;
+            }
+            
+            .formula-actions {
+                display: none;
+            }
+        }
+
         @media (max-width: 768px) {
             .symbol-buttons {
                 grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
@@ -603,6 +729,17 @@
             <input type="text" class="search-box" id="searchBox" placeholder="Cerca formule per nome, utilizzo o argomento..." onkeyup="searchFormulas()">
         </div>
 
+        <!-- Nuovi controlli avanzati -->
+        <div class="advanced-controls">
+            <button class="btn-secondary" onclick="exportFormulas()">📤 Esporta Formule</button>
+            <label for="importFile" class="file-input-custom">📥 Importa Formule</label>
+            <input type="file" id="importFile" accept=".json" onchange="importFormulas()" style="display: none;">
+            <button class="btn-warning" onclick="generatePDF()">📑 Genera PDF</button>
+            <button class="btn-info" onclick="printFormulas()">🖨️ Stampa</button>
+        </div>
+
+        <div id="messageContainer"></div>
+
         <div class="category-filter" id="categoryFilter">
             <div class="category-tag active" onclick="filterByCategory('all')">Tutte</div>
         </div>
@@ -617,11 +754,11 @@
         </div>
     </div>
 
-    <!-- Modal per aggiungere formule -->
+    <!-- Modal per aggiungere/modificare formule -->
     <div id="formulaModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Aggiungi Nuova Formula</h2>
+            <h2 id="modalTitle">Aggiungi Nuova Formula</h2>
             
             <div class="form-group">
                 <label for="formulaTitle">Nome della Formula:</label>
@@ -717,7 +854,7 @@
                 <textarea id="formulaExample" placeholder="es. Dati A(2,3) e B(5,7), d = √[(5-2)² + (7-3)²] = √[9 + 16] = √25 = 5"></textarea>
             </div>
 
-            <!-- NUOVA SEZIONE: Immagine -->
+            <!-- SEZIONE: Immagine -->
             <div class="form-group">
                 <label>📸 Immagine Esplicativa (opzionale):</label>
                 <div class="file-input-wrapper">
@@ -730,7 +867,7 @@
                 <p class="help-text">Carica un'immagine che aiuti a spiegare meglio la formula (grafici, diagrammi, etc.)</p>
             </div>
 
-            <!-- NUOVA SEZIONE: Link esterni -->
+            <!-- SEZIONE: Link esterni -->
             <div class="form-group">
                 <label>🔗 Link Esterni (opzionali):</label>
                 <div id="linksContainer">
@@ -744,7 +881,7 @@
                 <p class="help-text">Aggiungi link a GeoGebra, calcolatrici online, approfondimenti, etc.</p>
             </div>
 
-            <!-- NUOVA SEZIONE: Video -->
+            <!-- SEZIONE: Video -->
             <div class="form-group">
                 <label>🎥 Video Esplicativo (opzionale):</label>
                 
@@ -765,7 +902,7 @@
                 <p class="help-text">Carica un video che spieghi la formula o incolla un link YouTube</p>
             </div>
 
-            <button onclick="saveFormula()">💾 Salva Formula</button>
+            <button onclick="saveFormula()" id="saveButton">💾 Salva Formula</button>
         </div>
     </div>
 
@@ -773,6 +910,7 @@
         // Array per memorizzare le formule
         let formulas = [];
         let currentLinks = [];
+        let editingFormulaId = null;
 
         // Carica formule salvate
         function loadFormulas() {
@@ -875,7 +1013,10 @@
                         <div class="formula-usage"><strong>📌 Quando si usa:</strong><br>${formula.usage}</div>
                         <div class="formula-example"><strong>📝 Esempio:</strong><br>${formula.example}</div>
                         ${mediaContent}
-                        <button class="delete-btn" onclick="deleteFormula(${formula.id})">🗑️ Elimina</button>
+                        <div class="formula-actions">
+                            <button class="edit-btn" onclick="editFormula(${formula.id})">✏️ Modifica</button>
+                            <button class="delete-btn" onclick="deleteFormula(${formula.id})">🗑️ Elimina</button>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -884,6 +1025,264 @@
             if (window.MathJax) {
                 MathJax.typesetPromise().catch((e) => console.log(e));
             }
+        }
+
+        // NUOVA FUNZIONE: Modifica formula esistente
+        function editFormula(id) {
+            const formula = formulas.find(f => f.id === id);
+            if (!formula) return;
+
+            editingFormulaId = id;
+            
+            // Popola il form con i dati esistenti
+            document.getElementById('formulaTitle').value = formula.title;
+            document.getElementById('formulaCategory').value = formula.category;
+            document.getElementById('formulaLatex').value = formula.latex;
+            document.getElementById('formulaDescription').value = formula.description;
+            document.getElementById('formulaUsage').value = formula.usage;
+            document.getElementById('formulaExample').value = formula.example;
+            document.getElementById('youtubeUrl').value = formula.youtubeUrl || '';
+            
+            // Aggiorna preview LaTeX
+            updatePreview();
+            
+            // Popola link esistenti
+            currentLinks = [...(formula.links || [])];
+            updateLinksPreview();
+            
+            // Gestisci immagine esistente
+            if (formula.image) {
+                document.getElementById('imageLabel').textContent = '✅ Immagine caricata';
+                document.getElementById('imageLabel').classList.add('has-file');
+                document.getElementById('imagePreview').innerHTML = `
+                    <img src="${formula.image}" class="preview-image" alt="Anteprima">
+                    <br>
+                    <button type="button" class="remove-media" onclick="removeImage()">🗑️ Rimuovi</button>
+                `;
+            }
+            
+            // Gestisci video esistente
+            if (formula.video) {
+                document.getElementById('videoLabel').textContent = '✅ Video caricato';
+                document.getElementById('videoLabel').classList.add('has-file');
+                document.getElementById('videoPreview').innerHTML = `
+                    <video src="${formula.video}" class="preview-video" controls>
+                        Il tuo browser non supporta i video.
+                    </video>
+                    <br>
+                    <button type="button" class="remove-media" onclick="removeVideo()">🗑️ Rimuovi</button>
+                `;
+            }
+            
+            // Gestisci YouTube esistente
+            if (formula.youtubeUrl) {
+                handleYouTubeUrl();
+            }
+            
+            // Cambia titolo modal e pulsante
+            document.getElementById('modalTitle').textContent = 'Modifica Formula';
+            document.getElementById('saveButton').innerHTML = '💾 Aggiorna Formula';
+            
+            // Apri modal
+            document.getElementById('formulaModal').style.display = 'block';
+        }
+
+        // NUOVE FUNZIONI: Export/Import
+        function exportFormulas() {
+            try {
+                const dataStr = JSON.stringify(formulas, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `formulario_matematica_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                showMessage('✅ Formule esportate con successo!', 'success');
+            } catch (error) {
+                showMessage('❌ Errore durante l\'esportazione: ' + error.message, 'error');
+            }
+        }
+
+        function importFormulas() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedFormulas = JSON.parse(e.target.result);
+                    
+                    if (!Array.isArray(importedFormulas)) {
+                        throw new Error('Il file non contiene un array di formule valido');
+                    }
+                    
+                    // Verifica che ogni formula abbia le proprietà richieste
+                    const requiredProps = ['title', 'category', 'latex'];
+                    for (let formula of importedFormulas) {
+                        for (let prop of requiredProps) {
+                            if (!formula.hasOwnProperty(prop)) {
+                                throw new Error(`Proprietà mancante: ${prop}`);
+                            }
+                        }
+                        // Assegna un nuovo ID per evitare conflitti
+                        formula.id = Date.now() + Math.random();
+                    }
+                    
+                    // Chiedi conferma prima di importare
+                    const confirm = window.confirm(
+                        `Vuoi importare ${importedFormulas.length} formule?\n\n` +
+                        'ATTENZIONE: Questo aggiungerà le formule a quelle esistenti. ' +
+                        'Se vuoi sostituire completamente le formule attuali, esporta prima un backup!'
+                    );
+                    
+                    if (confirm) {
+                        formulas = formulas.concat(importedFormulas);
+                        saveFormulas();
+                        displayFormulas();
+                        updateCategories();
+                        showMessage(`✅ Importate ${importedFormulas.length} formule con successo!`, 'success');
+                    }
+                    
+                } catch (error) {
+                    showMessage('❌ Errore durante l\'importazione: ' + error.message, 'error');
+                }
+                
+                // Reset input
+                fileInput.value = '';
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // NUOVE FUNZIONI: PDF e Stampa
+        function generatePDF() {
+            if (formulas.length === 0) {
+                showMessage('❌ Nessuna formula da esportare in PDF!', 'error');
+                return;
+            }
+            
+            showMessage('📑 Generazione PDF in corso...', 'info');
+            
+            // Usa jsPDF per creare il PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            let yPosition = 20;
+            const pageHeight = doc.internal.pageSize.height;
+            const margin = 20;
+            
+            // Titolo
+            doc.setFontSize(20);
+            doc.setFont(undefined, 'bold');
+            doc.text('📐 Formulario Matematico', margin, yPosition);
+            yPosition += 15;
+            
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, margin, yPosition);
+            yPosition += 20;
+            
+            // Raggruppa per categoria
+            const formulasByCategory = {};
+            formulas.forEach(formula => {
+                if (!formulasByCategory[formula.category]) {
+                    formulasByCategory[formula.category] = [];
+                }
+                formulasByCategory[formula.category].push(formula);
+            });
+            
+            // Genera PDF per categoria
+            Object.keys(formulasByCategory).forEach(category => {
+                // Controllo spazio per categoria
+                if (yPosition > pageHeight - 60) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                // Titolo categoria
+                doc.setFontSize(16);
+                doc.setFont(undefined, 'bold');
+                doc.text(category, margin, yPosition);
+                yPosition += 10;
+                
+                // Formule della categoria
+                formulasByCategory[category].forEach(formula => {
+                    // Controllo spazio per formula
+                    if (yPosition > pageHeight - 80) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+                    
+                    doc.setFontSize(14);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(formula.title, margin, yPosition);
+                    yPosition += 8;
+                    
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    
+                    // LaTeX (semplificato - rimuovi comandi LaTeX)
+                    const simplifiedLatex = formula.latex
+                        .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)')
+                        .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
+                        .replace(/\\\w+/g, '') // Rimuovi altri comandi LaTeX
+                        .replace(/[{}]/g, '');
+                    
+                    doc.text(`Formula: ${simplifiedLatex}`, margin, yPosition);
+                    yPosition += 6;
+                    
+                    if (formula.description) {
+                        const desc = doc.splitTextToSize(formula.description, 170);
+                        doc.text(desc, margin, yPosition);
+                        yPosition += desc.length * 4;
+                    }
+                    
+                    if (formula.usage) {
+                        doc.setFont(undefined, 'italic');
+                        const usage = doc.splitTextToSize(`Quando si usa: ${formula.usage}`, 170);
+                        doc.text(usage, margin, yPosition);
+                        yPosition += usage.length * 4;
+                        doc.setFont(undefined, 'normal');
+                    }
+                    
+                    yPosition += 8; // Spazio tra formule
+                });
+                
+                yPosition += 5; // Spazio tra categorie
+            });
+            
+            // Salva PDF
+            doc.save(`formulario_matematica_${new Date().toISOString().split('T')[0]}.pdf`);
+            showMessage('✅ PDF generato e scaricato con successo!', 'success');
+        }
+
+        function printFormulas() {
+            if (formulas.length === 0) {
+                showMessage('❌ Nessuna formula da stampare!', 'error');
+                return;
+            }
+            
+            window.print();
+        }
+
+        // Funzione per mostrare messaggi
+        function showMessage(message, type) {
+            const container = document.getElementById('messageContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `${type}-message`;
+            messageDiv.textContent = message;
+            
+            container.appendChild(messageDiv);
+            
+            // Rimuovi messaggio dopo 5 secondi
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 5000);
         }
 
         // Estrai ID video YouTube dall'URL
@@ -946,12 +1345,16 @@
 
         // Gestione modal
         function openModal() {
+            editingFormulaId = null;
+            document.getElementById('modalTitle').textContent = 'Aggiungi Nuova Formula';
+            document.getElementById('saveButton').innerHTML = '💾 Salva Formula';
             document.getElementById('formulaModal').style.display = 'block';
             clearForm();
         }
 
         function closeModal() {
             document.getElementById('formulaModal').style.display = 'none';
+            editingFormulaId = null;
         }
 
         // Anteprima LaTeX
@@ -972,7 +1375,7 @@
             }
         }
 
-        // NUOVE FUNZIONI PER GESTIRE I MEDIA
+        // GESTIONE MEDIA (immagini, video, link)
 
         // Gestione upload immagine
         function handleImageUpload(input) {
@@ -1145,7 +1548,7 @@
             updateLinksPreview();
         }
 
-        // Salva nuova formula (AGGIORNATA)
+        // Salva formula (AGGIORNATA per gestire modifica)
         function saveFormula() {
             const title = document.getElementById('formulaTitle').value;
             const category = document.getElementById('formulaCategory').value;
@@ -1162,7 +1565,13 @@
             // Gestisci immagine
             let imageData = null;
             const imageFile = document.getElementById('formulaImage').files[0];
-            if (imageFile) {
+            
+            // Se siamo in modalità modifica e non c'è un nuovo file, mantieni l'immagine esistente
+            if (editingFormulaId && !imageFile) {
+                const existingFormula = formulas.find(f => f.id === editingFormulaId);
+                imageData = existingFormula ? existingFormula.image : null;
+                saveFormulaWithMedia();
+            } else if (imageFile) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     imageData = e.target.result;
@@ -1178,7 +1587,12 @@
                 let videoData = null;
                 const videoFile = document.getElementById('formulaVideo').files[0];
                 
-                if (videoFile) {
+                // Se siamo in modalità modifica e non c'è un nuovo file, mantieni il video esistente
+                if (editingFormulaId && !videoFile) {
+                    const existingFormula = formulas.find(f => f.id === editingFormulaId);
+                    videoData = existingFormula ? existingFormula.video : null;
+                    finalSave();
+                } else if (videoFile) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         videoData = e.target.result;
@@ -1190,8 +1604,7 @@
                 }
 
                 function finalSave() {
-                    const newFormula = {
-                        id: Date.now(),
+                    const formulaData = {
                         title,
                         category,
                         latex,
@@ -1204,7 +1617,20 @@
                         youtubeUrl: document.getElementById('youtubeUrl').value || null
                     };
 
-                    formulas.push(newFormula);
+                    if (editingFormulaId) {
+                        // Modalità modifica: aggiorna formula esistente
+                        const index = formulas.findIndex(f => f.id === editingFormulaId);
+                        if (index !== -1) {
+                            formulas[index] = { ...formulaData, id: editingFormulaId };
+                            showMessage('✅ Formula aggiornata con successo!', 'success');
+                        }
+                    } else {
+                        // Modalità nuova formula: aggiungi nuova
+                        const newFormula = { ...formulaData, id: Date.now() };
+                        formulas.push(newFormula);
+                        showMessage('✅ Formula aggiunta con successo!', 'success');
+                    }
+
                     saveFormulas();
                     displayFormulas();
                     updateCategories();
@@ -1220,6 +1646,7 @@
                 saveFormulas();
                 displayFormulas();
                 updateCategories();
+                showMessage('✅ Formula eliminata con successo!', 'success');
             }
         }
 
@@ -1239,6 +1666,9 @@
             removeYouTube();
             currentLinks = [];
             updateLinksPreview();
+            
+            // Reset editing mode
+            editingFormulaId = null;
         }
 
         // Chiudi modal cliccando fuori
@@ -1289,6 +1719,41 @@
         // Carica formule all'avvio
         window.addEventListener('DOMContentLoaded', function() {
             loadFormulas();
+        });
+
+        // Gestione keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+S per salvare (solo se modal è aperto)
+            if (e.ctrlKey && e.key === 's') {
+                const modal = document.getElementById('formulaModal');
+                if (modal.style.display === 'block') {
+                    e.preventDefault();
+                    saveFormula();
+                }
+            }
+            
+            // Escape per chiudere modal
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('formulaModal');
+                if (modal.style.display === 'block') {
+                    closeModal();
+                }
+            }
+        });
+
+        // Prevenire perdita dati se si chiude accidentalmente
+        window.addEventListener('beforeunload', function(e) {
+            const modal = document.getElementById('formulaModal');
+            if (modal.style.display === 'block') {
+                const title = document.getElementById('formulaTitle').value;
+                const latex = document.getElementById('formulaLatex').value;
+                
+                if (title || latex) {
+                    e.preventDefault();
+                    e.returnValue = 'Hai modifiche non salvate. Sei sicuro di voler uscire?';
+                    return e.returnValue;
+                }
+            }
         });
     </script>
 </body>
