@@ -53,6 +53,29 @@
             margin-bottom: 10px;
             font-size: 2.5em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        .logo:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
         }
 
         .subtitle {
@@ -720,7 +743,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>📐 MALEmaticApp</h1>
+        <h1>
+            <img src="icon.png" alt="MALEmatica Logo" class="logo">
+            📐 MALEmaticApp
+        </h1>
         <p class="subtitle">Il tuo assistente per memorizzare le formule matematiche</p>
         <p class="subtitle" style="font-size: 0.9em; margin-top: -10px; color: #999;">Sviluppato (MALE) da Antonio Moliterni (alias Ananasso Malvagio)</p>
 
